@@ -143,9 +143,11 @@ public class MatsimSlackClient implements StartupListener, ShutdownListener, Ite
             resolvedChannelId = response.getChannel();
             messageSender.setChannelId(resolvedChannelId);
             notifierManager.setThreadTs(simulationThreadTimestamp);
+        } else if (response != null && "not_in_channel".equals(response.getError())) {
+            LOG.error("Bot is not a member of the channel. Invite it with: /invite @YourBotName");
         }
 
-        String text = formatStartupMessage(startupEvent);
+        String text = ":rocket: " + formatStartupMessage(startupEvent);
         messageSender.postMessage(text, List.of(), SlackConstants.DEFAULT_EMOJI, simulationThreadTimestamp);
 
         addStopTerminationEvent();
@@ -171,9 +173,9 @@ public class MatsimSlackClient implements StartupListener, ShutdownListener, Ite
                     ctx.client().chatPostMessage(r -> r
                             .channel(ev.getChannel())
                             .threadTs(ev.getTs())
-                            .iconEmoji(":bomb:")
+                            .iconEmoji(":octagonal_sign:")
                             .username(userName)
-                            .text("Will stop the simulation gracefully!"));
+                            .text(":octagonal_sign: Will stop the simulation gracefully!"));
                 } else if ("crash".equals(ev.getText())) {
                     crashRequested = true;
                     ctx.client().chatPostMessage(r -> r
@@ -181,7 +183,7 @@ public class MatsimSlackClient implements StartupListener, ShutdownListener, Ite
                             .threadTs(ev.getTs())
                             .iconEmoji(":boom:")
                             .username(userName)
-                            .text("Crash requested — will crash on next sim step."));
+                            .text(":boom: Crash requested — will crash on next sim step."));
                 }
             }
             return ctx.ack();
@@ -225,8 +227,9 @@ public class MatsimSlackClient implements StartupListener, ShutdownListener, Ite
 
         messageSender.updateMessage(simulationThreadTimestamp, asBlocks(statusSection), "Simulation complete");
 
-        String text = String.format("Shutting down %s in iteration %d.",
-                (shutdownEvent.isUnexpected() ? "unexpectedly" : "normally"), shutdownEvent.getIteration());
+        String emoji = shutdownEvent.isUnexpected() ? ":large_red_square:" : ":large_green_circle:";
+        String text = String.format("%s Shutting down %s in iteration %d.",
+                emoji, (shutdownEvent.isUnexpected() ? "unexpectedly" : "normally"), shutdownEvent.getIteration());
         messageSender.postMessage(text, List.of(), SlackConstants.DEFAULT_EMOJI, simulationThreadTimestamp);
 
         try {
