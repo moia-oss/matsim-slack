@@ -295,11 +295,21 @@ All built-in notifiers can be configured via MATSim XML config. Custom notifiers
 
 Each `<parameterset type="...">` maps to a registered `NotifierConfig` subclass. The `type` attribute determines which params class is instantiated, and `<param>` elements set the `@Parameter` fields.
 
-## Building
+## Development
+
+### Building
 
 ```bash
 mvn clean compile    # compile
 mvn test             # run tests
+```
+
+### Secret Protection
+
+The repo includes a pre-commit hook that rejects commits containing Slack tokens. Enable it after cloning:
+
+```bash
+git config core.hooksPath .githooks
 ```
 
 ## Requirements
