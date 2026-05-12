@@ -196,7 +196,7 @@ public class MatsimSlackClient implements StartupListener, ShutdownListener, Ite
                 startupEvent.getServices().getConfig().global().getCoordinateSystem(),
                 startupEvent.getServices().getConfig().controller().getLastIteration(),
                 startupEvent.getServices().getConfig().controller().getOutputDirectory(),
-                startupEvent.getServices().getScenario().getPopulation().getPersons().values().size()
+                startupEvent.getServices().getScenario().getPopulation().getPersons().size()
         );
     }
 
