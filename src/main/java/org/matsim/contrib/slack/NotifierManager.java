@@ -81,7 +81,7 @@ public class NotifierManager {
 
     private SlackMessage combineMessages(List<SlackMessage> messages) {
         if (messages.size() == 1) {
-            return messages.get(0);
+            return messages.getFirst();
         }
 
         StringBuilder combinedText = new StringBuilder();
@@ -104,8 +104,8 @@ public class NotifierManager {
             }
         }
 
-        String emoji = messages.get(0).getEmoji() != null
-                ? messages.get(0).getEmoji()
+        String emoji = messages.getFirst().getEmoji() != null
+                ? messages.getFirst().getEmoji()
                 : SlackConstants.DEFAULT_EMOJI;
 
         return SlackMessage.builder()

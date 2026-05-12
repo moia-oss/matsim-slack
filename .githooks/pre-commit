@@ -1,0 +1,6 @@
+#!/bin/sh
+# Reject commits containing Slack tokens or common secrets
+if git diff --cached --diff-filter=d | grep -qE '(xoxb-[a-zA-Z0-9]|xapp-[a-zA-Z0-9]|SLACK_BOT_TOKEN\s*=\s*xoxb|SLACK_APP_TOKEN\s*=\s*xapp)'; then
+    echo "ERROR: Staged files contain Slack tokens. Remove them before committing."
+    exit 1
+fi
