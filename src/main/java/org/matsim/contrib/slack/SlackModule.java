@@ -11,14 +11,17 @@ import org.matsim.contrib.slack.notifier.impl.IterationProgressNotifier;
 import org.matsim.contrib.slack.notifier.impl.IterationTimeNotifier;
 import org.matsim.contrib.slack.notifier.impl.LinkTrafficNotifier;
 import org.matsim.contrib.slack.notifier.impl.MemoryObserverNotifier;
+import org.matsim.contrib.slack.notifier.impl.ModeShareNotifier;
 import org.matsim.contrib.slack.notifier.impl.StuckAgentNotifier;
 import org.matsim.contrib.drt.analysis.DrtEventSequenceCollector;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.TerminationCriterion;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.router.AnalysisMainModeIdentifier;
 
 import com.google.inject.Key;
 
@@ -42,6 +45,7 @@ public class SlackModule extends AbstractModule {
     private final SlackConfigGroup slackConfigGroup;
     private final Map<String, Function<MatsimSlackClient, SlackNotifier>> notifierFactories = new HashMap<>();
     private final List<DrtPerformanceNotifier> drtNotifiers = new ArrayList<>();
+    private final List<ModeShareNotifier> modeShareNotifiers = new ArrayList<>();
 
     public SlackModule(SlackConfigGroup slackConfigGroup) {
         super();
@@ -56,6 +60,7 @@ public class SlackModule extends AbstractModule {
         notifierFactories.put("iterationTime", IterationTimeNotifier::new);
         notifierFactories.put("iterationProgress", IterationProgressNotifier::new);
         notifierFactories.put("memoryObserver", MemoryObserverNotifier::new);
+        notifierFactories.put("modeShare", ModeShareNotifier::new);
     }
 
     public void registerNotifierFactory(String type, Function<MatsimSlackClient, SlackNotifier> factory) {
@@ -96,6 +101,9 @@ public class SlackModule extends AbstractModule {
             if (notifier instanceof DrtPerformanceNotifier drtNotifier) {
                 drtNotifiers.add(drtNotifier);
                 addControlerListenerBinding().toInstance(drtNotifier);
+            } else if (notifier instanceof ModeShareNotifier modeShareNotifier) {
+                modeShareNotifiers.add(modeShareNotifier);
+                addControlerListenerBinding().toInstance(modeShareNotifier);
             } else if (notifier instanceof EventHandlerNotifier eventHandlerNotifier) {
                 addEventHandlerBinding().toInstance(eventHandlerNotifier);
             } else if (notifier instanceof ControlerEventNotifier controlerEventNotifier) {
@@ -112,6 +120,18 @@ public class SlackModule extends AbstractModule {
                 DrtEventSequenceCollector collector = event.getServices().getInjector()
                         .getInstance(Key.get(DrtEventSequenceCollector.class, DvrpModes.mode(firstDrtMode.getMode())));
                 drtNotifiers.forEach(n -> n.setDrtEventSequenceCollector(collector));
+            });
+        }
+
+        if (!modeShareNotifiers.isEmpty()) {
+            addControlerListenerBinding().toInstance((StartupListener) event -> {
+                Population population = event.getServices().getScenario().getPopulation();
+                AnalysisMainModeIdentifier mmi = event.getServices().getInjector()
+                        .getInstance(AnalysisMainModeIdentifier.class);
+                modeShareNotifiers.forEach(n -> {
+                    n.setPopulation(population);
+                    n.setMainModeIdentifier(mmi);
+                });
             });
         }
     }

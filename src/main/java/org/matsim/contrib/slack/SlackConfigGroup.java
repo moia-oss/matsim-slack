@@ -8,6 +8,7 @@ import org.matsim.contrib.slack.notifier.impl.IterationProgressNotifierParams;
 import org.matsim.contrib.slack.notifier.impl.IterationTimeNotifierParams;
 import org.matsim.contrib.slack.notifier.impl.LinkTrafficNotifierParams;
 import org.matsim.contrib.slack.notifier.impl.MemoryObserverNotifierParams;
+import org.matsim.contrib.slack.notifier.impl.ModeShareNotifierParams;
 import org.matsim.contrib.slack.notifier.impl.StuckAgentNotifierParams;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
@@ -77,7 +78,8 @@ public class SlackConfigGroup extends ReflectiveConfigGroup {
             DrtPerformanceNotifierParams.SET_NAME, DrtPerformanceNotifierParams::new,
             IterationTimeNotifierParams.SET_NAME, IterationTimeNotifierParams::new,
             IterationProgressNotifierParams.SET_NAME, IterationProgressNotifierParams::new,
-            MemoryObserverNotifierParams.SET_NAME, MemoryObserverNotifierParams::new
+            MemoryObserverNotifierParams.SET_NAME, MemoryObserverNotifierParams::new,
+            ModeShareNotifierParams.SET_NAME, ModeShareNotifierParams::new
     ));
 
     public void registerNotifierType(String type, Supplier<NotifierConfig> factory) {

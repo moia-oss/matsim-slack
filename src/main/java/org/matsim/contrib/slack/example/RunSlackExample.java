@@ -10,6 +10,7 @@ import org.matsim.contrib.slack.notifier.impl.IterationProgressNotifierParams;
 import org.matsim.contrib.slack.notifier.impl.IterationTimeNotifierParams;
 import org.matsim.contrib.slack.notifier.impl.LinkTrafficNotifierParams;
 import org.matsim.contrib.slack.notifier.impl.MemoryObserverNotifierParams;
+import org.matsim.contrib.slack.notifier.impl.ModeShareNotifierParams;
 import org.matsim.contrib.slack.notifier.impl.StuckAgentNotifierParams;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -66,6 +67,10 @@ public class RunSlackExample {
         MemoryObserverNotifierParams memoryConfig = new MemoryObserverNotifierParams();
         memoryConfig.setReportInterval(2);
         slackConfigGroup.addNotifierConfig(memoryConfig);
+
+        ModeShareNotifierParams modeShareConfig = new ModeShareNotifierParams();
+        modeShareConfig.setReportInterval(5);
+        slackConfigGroup.addNotifierConfig(modeShareConfig);
 
         Controler controler = DrtControlerCreator.createControler(config, false);
         controler.addOverridingModule(new SlackModule(slackConfigGroup));
