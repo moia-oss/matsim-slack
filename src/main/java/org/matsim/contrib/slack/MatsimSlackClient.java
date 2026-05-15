@@ -232,6 +232,8 @@ public class MatsimSlackClient implements StartupListener, ShutdownListener, Ite
                 emoji, (shutdownEvent.isUnexpected() ? "unexpectedly" : "normally"), shutdownEvent.getIteration());
         messageSender.postMessage(text, List.of(), SlackConstants.DEFAULT_EMOJI, simulationThreadTimestamp);
 
+        messageSender.shutdown();
+
         try {
             socketApp.stop();
             socketApp.close();
